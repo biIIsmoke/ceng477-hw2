@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <iostream>
 
 #include "tinyxml2.h"
 #include "Triangle.h"
@@ -14,6 +15,75 @@
 
 using namespace tinyxml2;
 using namespace std;
+
+
+/* my helper functions */
+Matrix4 calculateCameraTransformationMatrix(Camera *camera)
+{
+	double _cameraRotationArray[4][4] =
+	{
+		{camera->u.x,camera->u.y,camera->u.z,0},
+		{camera->v.x,camera->v.y,camera->v.z,0},
+		{camera->w.x,camera->w.y,camera->w.z,0},
+		{0,0,0,1}
+	};
+	double _cameraTranslationArray[4][4] =
+	{
+		{1,0,0,-(camera->position.x)},
+		{0,1,0,-(camera->position.y)},
+		{0,0,1,-(camera->position.z)},
+		{0,0,0,1}
+	};
+	cout << "camera transformation done" << endl;
+	return multiplyMatrixWithMatrix(Matrix4(_cameraRotationArray),Matrix4(_cameraTranslationArray));
+}
+
+Matrix4 calculateCameraProjectionMatrix(Camera *camera)
+{
+	double _cameraProjectionArray[4][4] = //calculate orthographic as default
+	{
+		{2/(camera->right-camera->left),0,0,-((camera->right+camera->left)/(camera->right-camera->left))},
+		{0,2/(camera->top-camera->bottom),0,-((camera->top+camera->bottom)/(camera->top-camera->bottom))},
+		{0,0,2/(camera->near-camera->far),-((camera->near+camera->far)/(camera->near-camera->far))},
+		{0,0,0,1}
+	};
+	
+	
+	if(camera->projectionType == 0) //orthographic
+	{
+		cout << "camera orthographic projection done" << endl;
+		return Matrix4(_cameraProjectionArray);
+	}
+	else //perspective
+	{
+		//calculate perspective array and multiply with orthographic to find perspective projection matrix
+		double _perspectiveArray[4][4] =
+		{
+			{camera->near,0,0,0},
+			{0,camera->near,0,0},
+			{0,0,camera->near+camera->far,-(camera->far)*(camera->near)},
+			{0,0,1,0}
+		};
+		
+		cout << "camera perspective projection done" << endl;
+		return multiplyMatrixWithMatrix(Matrix4(_cameraProjectionArray),Matrix4(_perspectiveArray));
+	}
+}
+
+Matrix4 calculateCameraViewportTransformationMatrix(Camera *camera)
+{
+	// TODO: check if integer division creates issues
+	double _cameraViewportTransformationArray[4][4] =
+	{
+		{(camera->horRes)/2,0,0,(camera->horRes-1)/2},
+		{0,(camera->verRes)/2,0,(camera->verRes-1)/2},
+		{0,0,1,0},
+		{0,0,0,1}
+	};
+		
+	cout << "camera viewport done" << endl;
+	return Matrix4(_cameraViewportTransformationArray);
+}
 
 /*
 	Parses XML file
@@ -352,4 +422,25 @@ void Scene::convertPPMToPNG(string ppmFileName)
 void Scene::forwardRenderingPipeline(Camera *camera)
 {
 	// TODO: Implement this function
+
+	// calculate viewing transform matrices	
+	Matrix4 cameraViewportTransformationMatrix = calculateCameraViewportTransformationMatrix(camera);
+
+	cout << "camera viewport matrix: \n" << cameraViewportTransformationMatrix << endl;
+	
+	Matrix4 cameraProjectionMatrix = calculateCameraProjectionMatrix(camera);
+
+	cout << "camera projection matrix: \n" << cameraProjectionMatrix << endl;
+	
+	Matrix4 cameraTransformationMatrix = calculateCameraTransformationMatrix(camera);
+
+	cout << "camera transformation matrix: \n" << cameraTransformationMatrix << endl;
+	
+	Matrix4 cameraFinalMatrix = multiplyMatrixWithMatrix(multiplyMatrixWithMatrix(cameraViewportTransformationMatrix,cameraProjectionMatrix),cameraTransformationMatrix);
+
+	cout << "camera final matrix: \n" << cameraFinalMatrix << endl;
+	
+	// do the transformations on meshes
+	
+	//do rasterization
 }
