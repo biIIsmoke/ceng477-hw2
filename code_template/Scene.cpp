@@ -75,14 +75,61 @@ Matrix4 calculateCameraViewportTransformationMatrix(Camera *camera)
 	// TODO: check if integer division creates issues
 	double _cameraViewportTransformationArray[4][4] =
 	{
-		{(camera->horRes)/2,0,0,(camera->horRes-1)/2},
-		{0,(camera->verRes)/2,0,(camera->verRes-1)/2},
+		{(camera->horRes)/2.0,0,0,(camera->horRes-1)/2.0},
+		{0,(camera->verRes)/2.0,0,(camera->verRes-1)/2.0},
 		{0,0,1,0},
 		{0,0,0,1}
 	};
 		
 	cout << "camera viewport done" << endl;
 	return Matrix4(_cameraViewportTransformationArray);
+}
+
+Matrix4 calculateModelTransformationMatrix(Mesh & mesh, std::vector<Scaling *> & scalings, std::vector<Rotation *> & rotations, std::vector<Translation*> & translations)
+{
+	Matrix4 _modelTransformationMatrix = getIdentityMatrix();
+	
+	for(int i=0; i < mesh.numberOfTransformations; i++) //for each transformation
+	{
+		if(mesh.transformationTypes[i] == 's')
+		{
+			Scaling * _currentScaling = scalings[mesh.transformationIds[i]-1];
+			double _modelScalingArray[4][4] =
+			{
+				{_currentScaling->sx,0,0,0},
+				{0,_currentScaling->sy,0,0},
+				{0,0,_currentScaling->sz,0},
+				{0,0,0,1}
+			}
+			_modelTransformationMatrix = multiplyMatrixWithMatrix(Matrix4(_modelScalingArray),_modelTransformationMatrix);
+		}
+		else if(mesh.transformationTypes[i] == 'r')
+		{
+			Rotation * _currentRotation = rotations[mesh.transformationIds[i]-1];
+			double _modelRotationArray[4][4] =
+			{
+				{0,0,0,0},
+				{0,0,0,0},
+				{0,0,0,0},
+				{0,0,0,0}
+			}
+			_modelTransformationMatrix = multiplyMatrixWithMatrix(Matrix4(_modelRotationArray),_modelTransformationMatrix);
+		}
+		else if(mesh.transformationTypes[i] == 't')
+		{
+			Rotation * _currentTranslation = rotations[mesh.transformationIds[i]-1];
+			double _modelTranslationArray[4][4] =
+			{
+				{1,0,0,_currentTranslation->tx},
+				{0,1,0,_currentTranslation->ty},
+				{0,0,1,_currentTranslation->tz},
+				{0,0,0,1}
+			}
+			_modelTransformationMatrix = multiplyMatrixWithMatrix(Matrix4(_modelTranslationArray),_modelTransformationMatrix);
+		}
+
+		return _modelTransformationMatrix;
+	}
 }
 
 /*
@@ -440,9 +487,12 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 
 	cout << "camera final matrix: \n" << cameraFinalMatrix << endl;
 	
-	for (size_t i = 0; i < camera->meshes.size(); ++i) { //for each mesh
-		// do the transformations on meshes
-	
+	for (size_t i = 0; i < this->meshes.size(); ++i) { //for each mesh
+		// do the transformations on each vertex
+		Matrix4 modelTransformationMatrix = calculateModelTransformationMatrix(this->meshes[i], this->scalings, this->rotations, this->translations);
+		for()
+
+		//do clipping and culling	
 		//do rasterization
 	}
 	
