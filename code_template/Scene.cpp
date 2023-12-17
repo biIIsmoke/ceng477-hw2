@@ -440,7 +440,10 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 
 	cout << "camera final matrix: \n" << cameraFinalMatrix << endl;
 	
-	// do the transformations on meshes
+	for (size_t i = 0; i < camera->meshes.size(); ++i) { //for each mesh
+		// do the transformations on meshes
 	
-	//do rasterization
+		//do rasterization
+	}
+	
 }
