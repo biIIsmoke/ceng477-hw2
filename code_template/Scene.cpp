@@ -85,6 +85,29 @@ Matrix4 calculateCameraViewportTransformationMatrix(Camera *camera)
 	return Matrix4(_cameraViewportTransformationArray);
 }
 
+Vector3 findVFromU(Vector3 u)
+{
+	double _minimumComponent = fmin(fmin(abs(u.x),abs(u.y)),abs(u.z));
+	if(abs(u.x) == _minimumComponent) //x is minimum
+	{
+		return Vector3(0,-u.z,u.y);
+	}
+	else if(abs(u.y) == _minimumComponent) //y is minimum
+	{
+		return Vector3(-u.z,0,u.x);
+	}
+	else if(abs(u.z) == _minimumComponent) // z is minimum
+	{
+		return Vector3(-u.y,u.x,0);
+	}
+	else
+	{
+		cout << "Error: can't find v in findVFromU"
+		return Vector3(0,0,0);
+	}
+	
+}
+
 Matrix4 calculateModelTransformationMatrix(Mesh & mesh, std::vector<Scaling *> & scalings, std::vector<Rotation *> & rotations, std::vector<Translation*> & translations)
 {
 	Matrix4 _modelTransformationMatrix = getIdentityMatrix();
@@ -106,14 +129,38 @@ Matrix4 calculateModelTransformationMatrix(Mesh & mesh, std::vector<Scaling *> &
 		else if(mesh.transformationTypes[i] == 'r')
 		{
 			Rotation * _currentRotation = rotations[mesh.transformationIds[i]-1];
-			double _modelRotationArray[4][4] =
+			Vec3 u = Vec3(_currentRotation->ux,_currentRotation->uy,_currentRotation->uz);
+			Vec3 v = findVFromU(u);
+			Vec3 w = crossProductVec3(u,v);
+			v = normalizeVec3(v);
+			w = normalizeVec3(w);
+			Matrix4 _currentRotationMatrix = getIdentityMatrix();
+			double _transformArray[4][4] =
 			{
-				{0,0,0,0},
-				{0,0,0,0},
-				{0,0,0,0},
-				{0,0,0,0}
+				{u.x,u.y,u.z,0},
+				{v.x,v.y,v.z,0},
+				{w.x,w.y,w.z,0},
+				{0,0,0,1}
 			}
-			_modelTransformationMatrix = multiplyMatrixWithMatrix(Matrix4(_modelRotationArray),_modelTransformationMatrix);
+			_currentRotationMatrix = multiplyMatrixWithMatrix(Matrix4(_transformArray),_currentRotationMatrix);
+			double _xRotationArray[4][4] =
+			{
+				{1,0,0,0},
+				{0,cos(_currentRotation->angle*std::numbers::pi/180),-sin(_currentRotation->angle*std::numbers::pi/180),0},
+				{0,sin(_currentRotation->angle*std::numbers::pi/180),cos(_currentRotation->angle*std::numbers::pi/180),0},
+				{0,0,0,1}
+			}
+			_currentRotationMatrix = multiplyMatrixWithMatrix(Matrix4(_xRotationArray),_currentRotationMatrix);
+			double _inverseTransformArray[4][4] =
+			{
+				{u.x,v.x,w.x,0},
+				{u.y,v.y,w.y,0},
+				{u.z,v.z,w.z,0},
+				{0,0,0,1}
+			}
+			_currentRotationMatrix = multiplyMatrixWithMatrix(Matrix4(_inverseTransformArray),_currentRotationMatrix);
+			
+			_modelTransformationMatrix = multiplyMatrixWithMatrix(_currentRotationMatrix,_modelTransformationMatrix);
 		}
 		else if(mesh.transformationTypes[i] == 't')
 		{
