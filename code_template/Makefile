@@ -5,4 +5,7 @@ clean_ex:
 	rm -rf ./rasterizer
 
 clean_img:
-	rm -rf *.ppm *.png 
+	rm -rf *.ppm *.png
+clean:
+	rm -rf ./rasterizer
+	rm -rf *.ppm *.png
