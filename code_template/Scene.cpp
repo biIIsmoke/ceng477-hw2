@@ -118,6 +118,8 @@ void triangleRasterization(vector<vector<Color>> & image, Vec4 & viewported0, Ve
 	double alpha;
 	double beta;
 	double gamma;
+	double depth; // initial depth
+	
 	for(int x = 0; x<horRes; x++) //change this to bounding box later
 	{
 		for(int y = 0; y<verRes; y++)
@@ -129,12 +131,12 @@ void triangleRasterization(vector<vector<Color>> & image, Vec4 & viewported0, Ve
 			if(alpha >=0 && beta >= 0 and gamma >= 0)
 			{
 				c = colorSummation(colorSummation(colorMultiplier(color0,alpha),colorMultiplier(color1,beta)),colorMultiplier(color2,gamma));
-
-				draw(image, x, y, roundColor(c));
+				depth = alpha*viewported0.z + beta*viewported1.z + gamma*viewported2.z;
 				
-				if(depthBuffer[x][y]>0)
+				if(depthBuffer[x][y] > depth)
 				{
-					
+					depthBuffer[x][y] = depth;
+					draw(image, x, y, roundColor(c));
 				}
 			}
 		}
