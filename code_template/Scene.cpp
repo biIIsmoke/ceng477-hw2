@@ -781,6 +781,11 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			Vec4 projected0 = multiplyMatrixWithVec4(modelProjectionMatrix,vertex0);
 			Vec4 projected1 = multiplyMatrixWithVec4(modelProjectionMatrix,vertex1);
 			Vec4 projected2 = multiplyMatrixWithVec4(modelProjectionMatrix,vertex2);
+			
+			//do perspective division if necessary
+			perspectiveDivision(projected0);
+			perspectiveDivision(projected1);
+			perspectiveDivision(projected2);
 
 			//cout << "vertex0: \n" << vertex0 << endl;
 			//cout << "projected0: \n" << projected0 << endl;
@@ -794,10 +799,6 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			if(this->meshes[i]->type == 0) // if wireframe mode
 			{
 				cout << "in wireframe mode" << endl;
-				//do perspective division if necessary
-				perspectiveDivision(projected0);
-				perspectiveDivision(projected1);
-				perspectiveDivision(projected2);
 				//cout << "projected0: \n" << projected0 << endl;
 
 				//duplicate the vertexes again colors because clipping one will affect other lines and we don't want that
@@ -842,7 +843,13 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			}
 			else //else solid mode
 			{
+				// we don't need to clip stuff, we just iterate over pixels on viewport and check if they are inside a triangle
 				
+				Vec4 viewported0 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected0);
+				Vec4 viewported1 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected1);
+				Vec4 viewported2 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected2);
+				
+				//triangleRasterization(this->image);
 			}
 			
 		}
