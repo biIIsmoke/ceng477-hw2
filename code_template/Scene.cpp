@@ -175,7 +175,7 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 			c = colorSummation(c,dc);
 		}
 	}
-	else if(abs(dy) > abs(dx)) // if slope is larger than 1
+	else if(abs(dy) > abs(dx)) // if slope is larger than 1, we flip x and y like tilting our heads so it becomes smaller than 1 again
 	{
 		if(dy<0) // if vertex0.y is larger than vertex1.y, swap
 		{
@@ -816,7 +816,7 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 
 			if(this->cullingEnabled && isCulled(projected0,projected1,projected2)) //skip if culled
 			{
-				cout << "culling is enabled and current triangle is backfaced so it got culled" << endl;
+				//cout << "culling is enabled and current triangle is backfaced so it got culled" << endl;
 				continue;
 			}
 
