@@ -95,6 +95,11 @@ Color colorMultiplier(Color color, double m)
 	return Color(color.r * m, color.g * m, color.b * m);
 }
 
+Color colorSummation(Color color0, Color color1)
+{
+	return Color(color1.r + color0.r, color1.g + color0.g, color1.b + color0.b);
+}
+
 Color roundColor(Color c)
 {
 	return Color(round(c.r), round(c.g), round(c.b));
@@ -108,32 +113,97 @@ void draw(vector<vector<Color>> & image, int x, int y, Color c)
 
 void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Color & color0, Color & color1)
 {
-	if(viewported0.x > viewported1.x) // if vertex1 is left of vertex0, swap them
+	double dx = viewported1.x-viewported0.x;
+	double dy = viewported1.y-viewported0.y;
+	int d;
+	int increment = 1;
+	Color dc;
+	Color c = color0;
+
+	if(abs(dy) <= abs(dx)) // if slope is less than 1
 	{
-		midpoint(image, viewported1, viewported0, color1, color0);
-		//cout << "called swap" << endl;
-		return;
+		if(dx<0) // if vertex0.x is larger than vertex1.x, swap
+		{
+			midpoint(image, viewported1, viewported0, color1, color0);
+			return;
+		}
+		if(dy<0) // if vertex0.y is larger than vertex1.y, decrease y because slope is downwards
+		{
+			increment = -1;
+		}
+
+		int y = viewported0.y;
+		d = -dy + (increment * 0.5 * dx);
+		dc = colorMultiplier(color1MinusColor0(color0,color1),1/(dx));
+
+		for(int x = viewported0.x; x <= viewported1.x; x++)
+		{
+			draw(image, x, y, roundColor(c));
+			if(d * increment < 0)
+			{
+				y = y + increment;
+				d = d - dy + (increment * dx);
+			}
+			else
+			{
+				d = d - dy;
+			}
+			c = colorSummation(c,dc);
+		}
 	}
-	
-	int y = viewported0.y;
-	double d = (viewported0.y - viewported1.y) + 0.5 * (viewported1.x - viewported0.x);
-	Color c = Color(color0);
-	Color dc = colorMultiplier(color1MinusColor0(color0,color1),1/(viewported1.x - viewported0.x));
-	
-	for(int x = viewported0.x; x <= viewported1.x; ++x)
+	else if(abs(dy) > abs(dx)) // if slope is larger than 1
 	{
-		draw(image, x, y, roundColor(c));
-		if(d<0) // choose NE
+		if(dy<0) // if vertex0.y is larger than vertex1.y, swap
 		{
-			y = y + 1;
-			d = d + (viewported0.y - viewported1.y) + (viewported1.x - viewported0.x);
+			midpoint(image, viewported1, viewported0, color1, color0);
+			return;
 		}
-		else // choose E
+		if(dx<0) // if vertex0.x is larger than vertex1.x, decrease x because slope is downwards
 		{
-			d = d + (viewported0.y - viewported1.y);
+			increment = -1;
 		}
-		c = color1MinusColor0(colorMultiplier(c, -1.0),dc);
+		
+		int x = viewported0.x;
+		d = dx + (increment * 0.5 * -dy);
+		dc = colorMultiplier(color1MinusColor0(color0,color1),1/(dy));
+
+		for(int y = viewported0.y; y <= viewported1.y; y++)
+		{
+			draw(image, x, y, roundColor(c));
+			if(d * increment > 0)
+			{
+				x = x + increment;
+				d = d + dx + (increment * (-dy));
+			}
+			else
+			{
+				d = d + dx;
+			}
+			c = colorSummation(c,dc);
+		}
+		
 	}
+	/*
+	* int y = viewported0.y;
+		double d = (viewported0.y - viewported1.y) + 0.5 * (viewported1.x - viewported0.x);
+		Color c = Color(color0);
+		Color dc = colorMultiplier(color1MinusColor0(color0,color1),1/(viewported1.x - viewported0.x));
+	
+		for(int x = viewported0.x; x <= viewported1.x; ++x)
+		{
+			draw(image, x, y, roundColor(c));
+			if(d<0) // choose NE
+				{
+				y = y + 1;
+				d = d + (viewported0.y - viewported1.y) + (viewported1.x - viewported0.x);
+				}
+			else // choose E
+				{
+				d = d + (viewported0.y - viewported1.y);
+				}
+			c = color1MinusColor0(colorMultiplier(c, -1.0),dc);
+		}
+	 */
 }
 
 bool liangBarsky(Vec4 & vertex0, Vec4 & vertex1, Color & color0, Color & color1)
