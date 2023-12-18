@@ -212,33 +212,31 @@ Matrix4 calculateCameraTransformationMatrix(Camera *camera)
 
 Matrix4 calculateCameraProjectionMatrix(Camera *camera)
 {
-	double _cameraProjectionArray[4][4] = //calculate orthographic as default 
-	{
-		{2/(camera->right-camera->left),0,0,-((camera->right+camera->left)/(camera->right-camera->left))},
-		{0,2/(camera->top-camera->bottom),0,-((camera->top+camera->bottom)/(camera->top-camera->bottom))},
-		{0,0,2/(camera->near-camera->far),-((camera->near+camera->far)/(camera->near-camera->far))},
-		{0,0,0,1}
-	};
-	
-	
 	if(camera->projectionType == 0) //orthographic
 	{
+		double _cameraOrthographicProjectionArray[4][4] = //calculate orthographic
+		{
+			{2/(camera->right-camera->left),0,0,-((camera->right+camera->left)/(camera->right-camera->left))},
+			{0,2/(camera->top-camera->bottom),0,-((camera->top+camera->bottom)/(camera->top-camera->bottom))},
+			{0,0,2/(camera->near-camera->far),-((camera->far+camera->near)/(camera->far-camera->near))},
+			{0,0,0,1}
+		};
 		cout << "camera orthographic projection done" << endl;
-		return Matrix4(_cameraProjectionArray);
+		return Matrix4(_cameraOrthographicProjectionArray);
 	}
 	else //perspective
 	{
-		//calculate perspective array and multiply with orthographic to find perspective projection matrix TODO: check if i need to change it from book to the slide version with -1 etc.
-		double _perspectiveArray[4][4] =
+		//calculate perspective array
+		double _cameraPerspectiveArray[4][4] =
 		{
-			{camera->near,0,0,0},
-			{0,camera->near,0,0},
-			{0,0,camera->near+camera->far,-(camera->far)*(camera->near)},
-			{0,0,1,0}
+			{(2 * camera->near)/(camera->right - camera->left),0,(camera->right + camera->left)/(camera->right - camera->left),0},
+			{0,(2 * camera->near)/(camera->top - camera->bottom),(camera->top + camera->bottom)/(camera->top - camera->bottom),0},
+			{0,0,-(camera->far + camera->near)/(camera->far - camera->near),-(2 * camera->far * camera->near)/(camera->far - camera->near)},
+			{0,0,-1,0}
 		};
 		
 		cout << "camera perspective projection done" << endl;
-		return multiplyMatrixWithMatrix(Matrix4(_cameraProjectionArray),Matrix4(_perspectiveArray));
+		return Matrix4(_cameraPerspectiveArray);
 	}
 }
 
@@ -249,7 +247,7 @@ Matrix4 calculateCameraViewportTransformationMatrix(Camera *camera)
 	{
 		{(camera->horRes)/2.0,0,0,(camera->horRes-1)/2.0},
 		{0,(camera->verRes)/2.0,0,(camera->verRes-1)/2.0},
-		{0,0,1,0},
+		{0,0,0.5,0.5},
 		{0,0,0,1}
 	};
 		
