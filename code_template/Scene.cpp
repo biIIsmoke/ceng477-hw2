@@ -108,24 +108,50 @@ void draw(vector<vector<Color>> & image, int x, int y, Color c)
 
 void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Color & color0, Color & color1)
 {
+	if(viewported0.x > viewported1.x) // if vertex1 is left of vertex0, swap them
+	{
+		midpoint(image, viewported1, viewported0, color1, color0);
+		return;
+	}
+
 	int y = viewported0.y;
 	double d = 2 * (viewported0.y - viewported1.y) + (viewported1.x - viewported0.x);
 	Color c = Color(color0);
 	Color dc = colorMultiplier(color1MinusColor0(color0,color1),1/(viewported1.x - viewported0.x));
-
-	for(int x = viewported0.x; x <= viewported1.x; ++x)
+	
+	if(viewported0.y < viewported1.y) // if vertex0 is below vertex1, increase y
 	{
-		draw(image, x, y, roundColor(c));
-		if(d < 0) // choose NE
+		for(int x = viewported0.x; x <= viewported1.x; ++x)
 		{
-			y = y + 1;
-			d = d + 2 * ((viewported0.y - viewported1.y)+(viewported1.x - viewported0.x));
+			draw(image, x, y, roundColor(c));
+			if(d<0) // choose NE
+			{
+				y = y + 1;
+				d = d + 2 * ((viewported0.y - viewported1.y)+(viewported1.x - viewported0.x));
+			}
+			else // choose E
+			{
+				d = d + 2 * (viewported0.y - viewported1.y);
+			}
+			c = color1MinusColor0(colorMultiplier(c, -1.0),dc);
 		}
-		else // choose E
+	}
+	else // if vertex0 above vertex1, decrease y
+	{
+		for(int x = viewported0.x; x >= viewported1.x; ++x)
 		{
-			d = d + 2 * (viewported0.y - viewported1.y);
+			draw(image, x, y, roundColor(c));
+			if(d<0) // choose SE
+			{
+				y = y + 1;
+				d = d + 2 * ((viewported0.y - viewported1.y)+(viewported1.x - viewported0.x));
+			}
+			else // choose E
+			{
+				d = d + 2 * (viewported0.y - viewported1.y);
+			}
+			c = color1MinusColor0(colorMultiplier(c, -1.0),dc);
 		}
-		c = color1MinusColor0(colorMultiplier(c, -1.0),dc);
 	}
 }
 
