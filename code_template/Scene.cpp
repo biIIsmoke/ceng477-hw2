@@ -151,8 +151,6 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 	int increment = 1;
 	Color dc;
 	Color c = color0;
-	double dz;
-	double depth = viewported0.z;
 
 	if(abs(dy) <= abs(dx)) // if slope is less than 1
 	{
@@ -169,16 +167,9 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 		int y = viewported0.y;
 		d = -dy + (increment * 0.5 * dx);
 		dc = colorMultiplier(color1MinusColor0(color0,color1),1/(dx));
-		dz = (viewported1.z-viewported0.z)/dx;
 		for(int x = viewported0.x; x <= viewported1.x; x++)
 		{
-			if(depthBuffer[x][y] > depth)
-			{
-				//cout << "depth: " << depth << endl;
-				//cout << "depthbuffer: " << depthBuffer[x][y] << endl;
-				draw(image, x, y, roundColor(c));
-				depthBuffer[x][y] = depth;
-			}
+			draw(image, x, y, roundColor(c));
 			if(d * increment < 0)
 			{
 				y = y + increment;
@@ -188,7 +179,6 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 			{
 				d = d - dy;
 			}
-			depth = depth + dz;
 			c = colorSummation(c,dc);
 		}
 	}
@@ -207,16 +197,10 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 		int x = viewported0.x;
 		d = dx + (increment * 0.5 * -dy);
 		dc = colorMultiplier(color1MinusColor0(color0,color1),1/(dy));
-		double dz;
-		double depth = viewported0.z;
 
 		for(int y = viewported0.y; y <= viewported1.y; y++)
 		{
-			if(depthBuffer[x][y] > depth)
-			{
-				draw(image, x, y, roundColor(c));
-				depthBuffer[x][y] = depth;
-			}
+			draw(image, x, y, roundColor(c));
 			if(d * increment > 0)
 			{
 				x = x + increment;
@@ -226,7 +210,6 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 			{
 				d = d + dx;
 			}
-			depth = depth + dz;
 			c = colorSummation(c,dc);
 		}
 	}
