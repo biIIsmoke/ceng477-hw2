@@ -181,29 +181,7 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 			}
 			c = colorSummation(c,dc);
 		}
-		
 	}
-	/*
-	* int y = viewported0.y;
-		double d = (viewported0.y - viewported1.y) + 0.5 * (viewported1.x - viewported0.x);
-		Color c = Color(color0);
-		Color dc = colorMultiplier(color1MinusColor0(color0,color1),1/(viewported1.x - viewported0.x));
-	
-		for(int x = viewported0.x; x <= viewported1.x; ++x)
-		{
-			draw(image, x, y, roundColor(c));
-			if(d<0) // choose NE
-				{
-				y = y + 1;
-				d = d + (viewported0.y - viewported1.y) + (viewported1.x - viewported0.x);
-				}
-			else // choose E
-				{
-				d = d + (viewported0.y - viewported1.y);
-				}
-			c = color1MinusColor0(colorMultiplier(c, -1.0),dc);
-		}
-	 */
 }
 
 bool liangBarsky(Vec4 & vertex0, Vec4 & vertex1, Color & color0, Color & color1)
