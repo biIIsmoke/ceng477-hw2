@@ -723,6 +723,9 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			Vec4 projected1 = multiplyMatrixWithVec4(modelProjectionMatrix,vertex1);
 			Vec4 projected2 = multiplyMatrixWithVec4(modelProjectionMatrix,vertex2);
 
+			cout << "vertex0: \n" << vertex0 << endl;
+			cout << "projected0: \n" << projected0 << endl;
+
 			if(this->cullingEnabled && isCulled(projected0,projected1,projected2)) //skip if culled
 			{
 				cout << "culling is enabled and current triangle is backfaced so it got culled" << endl;
