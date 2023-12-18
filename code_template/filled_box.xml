@@ -7,63 +7,63 @@
 			<Gaze>1 1 -0.2</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_1.ppm</OutputName>
+			<OutputName>filled_box_1.ppm</OutputName>
 		</Camera>
 		<Camera id="2" type="perspective">
 			<Position>-20 -28 -23</Position>
 			<Gaze>1 0.5 -0.2</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_2.ppm</OutputName>
+			<OutputName>filled_box_2.ppm</OutputName>
 		</Camera>
 		<Camera id="3" type="perspective">
 			<Position>-15 -2 -23</Position>
 			<Gaze>1 -0.3 -0.2</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_3.ppm</OutputName>
+			<OutputName>filled_box_3.ppm</OutputName>
 		</Camera>
 		<Camera id="4" type="perspective">
 			<Position>9 5 0</Position>
 			<Gaze>0.1 -0.3 -0.5</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_4.ppm</OutputName>
+			<OutputName>filled_box_4.ppm</OutputName>
 		</Camera>
 		<Camera id="5" type="perspective">
 			<Position>40 0 -10</Position>
 			<Gaze>-0.5 -0.3 -0.3</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_5.ppm</OutputName>
+			<OutputName>filled_box_5.ppm</OutputName>
 		</Camera>
 		<Camera id="6" type="perspective">
 			<Position>45 -5 -23</Position>
 			<Gaze>-1 -0.3 -0.2</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_6.ppm</OutputName>
+			<OutputName>filled_box_6.ppm</OutputName>
 		</Camera>
 		<Camera id="7" type="perspective">
 			<Position>50 -28 -23</Position>
 			<Gaze>-1 0.5 -0.2</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_7.ppm</OutputName>
+			<OutputName>filled_box_7.ppm</OutputName>
 		</Camera>
 		<Camera id="8" type="perspective">
 			<Position>40 -40 -26</Position>
 			<Gaze>-1 1 -0.2</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_8.ppm</OutputName>
+			<OutputName>filled_box_8.ppm</OutputName>
 		</Camera>
 		<Camera id="9" type="perspective">
 			<Position>0 5 0</Position>
 			<Gaze>0.1 -0.3 -0.5</Gaze>
 			<Up>0 1 0</Up>
 			<ImagePlane>-1 1 -1 1 2 1000 700 700</ImagePlane>
-			<OutputName>empty_box_example.ppm</OutputName>
+			<OutputName>filled_box_example.ppm</OutputName>
 		</Camera>
 	</Cameras>
 
@@ -95,7 +95,7 @@
 
 	<Meshes>
 
-		<Mesh id="1" type="wireframe">
+		<Mesh id="1" type="solid">
 			<Transformations>
 				<Transformation>r 1</Transformation>
 				<Transformation>t 2</Transformation>

@@ -42,11 +42,11 @@ bool isCulled(Vec4 & projected0, Vec4 & projected1, Vec4 & projected2)
 	Vec3 _normalVector = normalizeVec3(crossProductVec3(_line01,_line02));
 	
 	double product = dotProductVec3(_normalVector, _vertex0);
-	if(product > 0) // n.v > 0 so back facing triangle, gets culled
+	if(product < 0) // n.v < 0 so back facing triangle, gets culled
 	{
 		return true;
 	}
-	else // n.v < 0 so front facin triangle, doesn't get culled
+	else // n.v > 0 so front facin triangle, doesn't get culled
 	{
 		return false;
 	}
@@ -813,9 +813,9 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				//line v0-v1
 				bool is01Visible = liangBarsky(projected0, projected1, color0, color1);
 				//line v1-v2
-				bool is12Visible = liangBarsky( projected1_copy, projected2, color1_copy, color2);
+				bool is12Visible = liangBarsky(projected1_copy, projected2, color1_copy, color2);
 				//line v2-v0
-				bool is20Visible = liangBarsky( projected2_copy, projected0_copy, color2_copy, color0_copy);
+				bool is20Visible = liangBarsky(projected2_copy, projected0_copy, color2_copy, color0_copy);
 
 				//we finally have our clipped lines, if they are visible, apply viewport transformation to their vertices to get their coordinates on viewport
 				if(is01Visible)
