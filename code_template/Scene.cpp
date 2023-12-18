@@ -103,7 +103,7 @@ Color roundColor(Color c)
 void draw(vector<vector<Color>> & image, int x, int y, Color c)
 {
 	image[x][y]=c;
-	cout << "image color at " << x << "," << y << " is: " << c << endl;
+	//cout << "image color at " << x << "," << y << " is: " << c << endl;
 }
 
 void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Color & color0, Color & color1)
@@ -143,7 +143,7 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 			draw(image, x, y, roundColor(c));
 			if(d<0) // choose SE
 			{
-				y = y + 1;
+				y = y - 1;
 				d = d + 2 * ((viewported0.y - viewported1.y)+(viewported1.x - viewported0.x));
 			}
 			else // choose E
@@ -157,7 +157,7 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 
 bool liangBarsky(Vec4 & vertex0, Vec4 & vertex1, Color & color0, Color & color1)
 {
-	cout << "liang barsky" << endl;
+	//cout << "liang barsky" << endl;
 	double t_E = 0;
 	double t_L = 1;
 	
@@ -176,22 +176,22 @@ bool liangBarsky(Vec4 & vertex0, Vec4 & vertex1, Color & color0, Color & color1)
 	bool visibility = false;
 	if(isVisible(d_x, x_min-vertex0.x, t_E, t_L)) //left
 	{
-		cout << "liang barsky 1" << endl;
+		//cout << "liang barsky 1" << endl;
 		if(isVisible(-d_x, vertex0.x-x_max, t_E, t_L)) //right
 		{
-			cout << "liang barsky 2" << endl;
+			//cout << "liang barsky 2" << endl;
 			if(isVisible(d_y, y_min-vertex0.y, t_E, t_L)) //bottom
 			{
-				cout << "liang barsky 3" << endl;
+				//cout << "liang barsky 3" << endl;
 				if(isVisible(-d_y, vertex0.y-y_max, t_E, t_L)) //top
 				{
-					cout << "liang barsky 4" << endl;
+					//cout << "liang barsky 4" << endl;
 					if(isVisible(d_z, z_min-vertex0.z, t_E, t_L)) //front
 					{
-						cout << "liang barsky 5" << endl;
+						//cout << "liang barsky 5" << endl;
 						if(isVisible(-d_z, vertex0.z-z_max, t_E, t_L)) //back
 						{
-							cout << "liang barsky 6" << endl;
+							//cout << "liang barsky 6" << endl;
 							visibility = true;
 							if(t_L < 1)
 							{
@@ -735,11 +735,11 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 
 		Matrix4 modelProjectionMatrix = multiplyMatrixWithMatrix(cameraProjectionTransformationMatrix,modelTransformationMatrix);
 		
-		cout << "modelProjectionMatrix done" << endl;
+		//cout << "modelProjectionMatrix done" << endl;
 		
 		for(size_t j = 0; j < this->meshes[i]->triangles.size(); ++j) //for each triangle
 		{
-			cout << "for each triangle: " << j << endl;
+			//cout << "for each triangle: " << j << endl;
 			
 			Vec4 vertex0 = Vec4(this->vertices[this->meshes[i]->triangles[j].vertexIds[0]-1]->x,this->vertices[this->meshes[i]->triangles[j].vertexIds[0]-1]->y,this->vertices[this->meshes[i]->triangles[j].vertexIds[0]-1]->z,1,this->vertices[this->meshes[i]->triangles[j].vertexIds[0]-1]->colorId);
 			Vec4 vertex1 = Vec4(this->vertices[this->meshes[i]->triangles[j].vertexIds[1]-1]->x,this->vertices[this->meshes[i]->triangles[j].vertexIds[1]-1]->y,this->vertices[this->meshes[i]->triangles[j].vertexIds[1]-1]->z,1,this->vertices[this->meshes[i]->triangles[j].vertexIds[1]-1]->colorId);
@@ -753,8 +753,8 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 			Vec4 projected1 = multiplyMatrixWithVec4(modelProjectionMatrix,vertex1);
 			Vec4 projected2 = multiplyMatrixWithVec4(modelProjectionMatrix,vertex2);
 
-			cout << "vertex0: \n" << vertex0 << endl;
-			cout << "projected0: \n" << projected0 << endl;
+			//cout << "vertex0: \n" << vertex0 << endl;
+			//cout << "projected0: \n" << projected0 << endl;
 
 			if(this->cullingEnabled && isCulled(projected0,projected1,projected2)) //skip if culled
 			{
@@ -769,13 +769,13 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				perspectiveDivision(projected0);
 				perspectiveDivision(projected1);
 				perspectiveDivision(projected2);
-				cout << "projected0: \n" << projected0 << endl;
+				//cout << "projected0: \n" << projected0 << endl;
 
 				//duplicate the vertexes again colors because clipping one will affect other lines and we don't want that
 				Vec4 projected0_copy = Vec4(projected0);
 				Vec4 projected1_copy = Vec4(projected1);
 				Vec4 projected2_copy = Vec4(projected2);
-				cout << "projected0_copy: \n" << projected0_copy << endl;
+				//cout << "projected0_copy: \n" << projected0_copy << endl;
 
 				Color color0_copy = Color(color0);
 				Color color1_copy = Color(color1);
@@ -791,21 +791,21 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				//we finally have our clipped lines, if they are visible, apply viewport transformation to their vertices to get their coordinates on viewport
 				if(is01Visible)
 				{
-					cout << "01 visible" << endl;
+					//cout << "01 visible" << endl;
 					Vec4 viewported0 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected0);
 					Vec4 viewported1 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected1);
 					midpoint(this->image, viewported0, viewported1, color0, color1);
 				}
 				if(is12Visible)
 				{
-					cout << "12 visible" << endl;
+					//cout << "12 visible" << endl;
 					Vec4 viewported1_copy = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected1_copy);
 					Vec4 viewported2 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected2);
 					midpoint(this->image, viewported1_copy, viewported2, color1_copy, color2);
 				}
 				if(is20Visible)
 				{
-					cout << "20 visible" << endl;
+					//cout << "20 visible" << endl;
 					Vec4 viewported2_copy = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected2_copy);
 					Vec4 viewported0_copy = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected0_copy);
 					midpoint(this->image, viewported2_copy, viewported0_copy, color2_copy, color0_copy);
