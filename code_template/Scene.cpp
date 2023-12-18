@@ -111,7 +111,7 @@ void draw(vector<vector<Color>> & image, int x, int y, Color c)
 	//cout << "image color at " << x << "," << y << " is: " << c << endl;
 }
 
-void triangleRasterization(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Vec4 & viewported2, int horRes, int verRes, Color color0,  Color color1,  Color color2)
+void triangleRasterization(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Vec4 & viewported2, int horRes, int verRes, Color color0,  Color color1,  Color color2, std::vector<std::vector<double>> & depthBuffer)
 {
 	Color c;
 	double detT;
@@ -129,13 +129,19 @@ void triangleRasterization(vector<vector<Color>> & image, Vec4 & viewported0, Ve
 			if(alpha >=0 && beta >= 0 and gamma >= 0)
 			{
 				c = colorSummation(colorSummation(colorMultiplier(color0,alpha),colorMultiplier(color1,beta)),colorMultiplier(color2,gamma));
+
 				draw(image, x, y, roundColor(c));
+				
+				if(depthBuffer[x][y]>0)
+				{
+					
+				}
 			}
 		}
 	}
 }
 
-void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Color & color0, Color & color1)
+void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Color & color0, Color & color1, std::vector<std::vector<double>> & depthBuffer)
 {
 	double dx = viewported1.x-viewported0.x;
 	double dy = viewported1.y-viewported0.y;
@@ -143,12 +149,14 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 	int increment = 1;
 	Color dc;
 	Color c = color0;
+	double dz;
+	double depth = viewported0.z;
 
 	if(abs(dy) <= abs(dx)) // if slope is less than 1
 	{
 		if(dx<0) // if vertex0.x is larger than vertex1.x, swap
 		{
-			midpoint(image, viewported1, viewported0, color1, color0);
+			midpoint(image, viewported1, viewported0, color1, color0, depthBuffer);
 			return;
 		}
 		if(dy<0) // if vertex0.y is larger than vertex1.y, decrease y because slope is downwards
@@ -159,10 +167,16 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 		int y = viewported0.y;
 		d = -dy + (increment * 0.5 * dx);
 		dc = colorMultiplier(color1MinusColor0(color0,color1),1/(dx));
-
+		dz = (viewported1.z-viewported0.z)/dx;
 		for(int x = viewported0.x; x <= viewported1.x; x++)
 		{
-			draw(image, x, y, roundColor(c));
+			if(depthBuffer[x][y] > depth)
+			{
+				cout << "depth: " << depth << endl;
+				cout << "depthbuffer: " << depthBuffer[x][y] << endl;
+				draw(image, x, y, roundColor(c));
+				depthBuffer[x][y] = depth;
+			}
 			if(d * increment < 0)
 			{
 				y = y + increment;
@@ -172,6 +186,7 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 			{
 				d = d - dy;
 			}
+			depth = depth + dz;
 			c = colorSummation(c,dc);
 		}
 	}
@@ -179,7 +194,7 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 	{
 		if(dy<0) // if vertex0.y is larger than vertex1.y, swap
 		{
-			midpoint(image, viewported1, viewported0, color1, color0);
+			midpoint(image, viewported1, viewported0, color1, color0, depthBuffer);
 			return;
 		}
 		if(dx<0) // if vertex0.x is larger than vertex1.x, decrease x because slope is downwards
@@ -190,10 +205,16 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 		int x = viewported0.x;
 		d = dx + (increment * 0.5 * -dy);
 		dc = colorMultiplier(color1MinusColor0(color0,color1),1/(dy));
+		double dz;
+		double depth = viewported0.z;
 
 		for(int y = viewported0.y; y <= viewported1.y; y++)
 		{
-			draw(image, x, y, roundColor(c));
+			if(depthBuffer[x][y] > depth)
+			{
+				draw(image, x, y, roundColor(c));
+				depthBuffer[x][y] = depth;
+			}
 			if(d * increment > 0)
 			{
 				x = x + increment;
@@ -203,6 +224,7 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 			{
 				d = d + dx;
 			}
+			depth = depth + dz;
 			c = colorSummation(c,dc);
 		}
 	}
@@ -848,21 +870,21 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 					//cout << "01 visible" << endl;
 					Vec4 viewported0 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected0);
 					Vec4 viewported1 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected1);
-					midpoint(this->image, viewported0, viewported1, color0, color1);
+					midpoint(this->image, viewported0, viewported1, color0, color1, this->depth);
 				}
 				if(is12Visible)
 				{
 					//cout << "12 visible" << endl;
 					Vec4 viewported1_copy = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected1_copy);
 					Vec4 viewported2 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected2);
-					midpoint(this->image, viewported1_copy, viewported2, color1_copy, color2);
+					midpoint(this->image, viewported1_copy, viewported2, color1_copy, color2, this->depth);
 				}
 				if(is20Visible)
 				{
 					//cout << "20 visible" << endl;
 					Vec4 viewported2_copy = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected2_copy);
 					Vec4 viewported0_copy = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected0_copy);
-					midpoint(this->image, viewported2_copy, viewported0_copy, color2_copy, color0_copy);
+					midpoint(this->image, viewported2_copy, viewported0_copy, color2_copy, color0_copy, this->depth);
 				}
 			}
 			else //else solid mode
@@ -873,7 +895,7 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				Vec4 viewported1 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected1);
 				Vec4 viewported2 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected2);
 				
-				triangleRasterization(this->image, viewported0, viewported1, viewported2, camera->horRes, camera->verRes, Color(*this->colorsOfVertices[vertex0.colorId-1]), Color(*this->colorsOfVertices[vertex1.colorId-1]), Color(*this->colorsOfVertices[vertex2.colorId-1]));
+				triangleRasterization(this->image, viewported0, viewported1, viewported2, camera->horRes, camera->verRes, Color(*this->colorsOfVertices[vertex0.colorId-1]), Color(*this->colorsOfVertices[vertex1.colorId-1]), Color(*this->colorsOfVertices[vertex2.colorId-1]), this->depth);
 			}
 			
 		}

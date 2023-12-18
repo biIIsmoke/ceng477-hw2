@@ -1,6 +1,6 @@
 <Scene>
 	<BackgroundColor>255 255 255</BackgroundColor>
-	<Culling>enabled</Culling>
+	<Culling>disabled</Culling>
 	<Cameras>
 		<Camera id="1" type="perspective">
 			<Position>0 0 60</Position>
