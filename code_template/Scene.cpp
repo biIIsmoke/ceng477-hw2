@@ -174,8 +174,8 @@ void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewport
 		{
 			if(depthBuffer[x][y] > depth)
 			{
-				cout << "depth: " << depth << endl;
-				cout << "depthbuffer: " << depthBuffer[x][y] << endl;
+				//cout << "depth: " << depth << endl;
+				//cout << "depthbuffer: " << depthBuffer[x][y] << endl;
 				draw(image, x, y, roundColor(c));
 				depthBuffer[x][y] = depth;
 			}
