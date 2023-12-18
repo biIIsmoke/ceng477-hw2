@@ -150,16 +150,22 @@ bool liangBarsky(Vec4 & vertex0, Vec4 & vertex1, Color & color0, Color & color1)
 	bool visibility = false;
 	if(isVisible(d_x, x_min-vertex0.x, t_E, t_L)) //left
 	{
+		cout << "liang barsky 1" << endl;
 		if(isVisible(-d_x, vertex0.x-x_max, t_E, t_L)) //right
 		{
+			cout << "liang barsky 2" << endl;
 			if(isVisible(d_y, y_min-vertex0.y, t_E, t_L)) //bottom
 			{
+				cout << "liang barsky 3" << endl;
 				if(isVisible(-d_y, vertex0.y-y_max, t_E, t_L)) //top
 				{
+					cout << "liang barsky 4" << endl;
 					if(isVisible(d_z, z_min-vertex0.z, t_E, t_L)) //front
 					{
+						cout << "liang barsky 5" << endl;
 						if(isVisible(-d_z, vertex0.z-z_max, t_E, t_L)) //back
 						{
+							cout << "liang barsky 6" << endl;
 							visibility = true;
 							if(t_L < 1)
 							{
@@ -739,11 +745,13 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				perspectiveDivision(projected0);
 				perspectiveDivision(projected1);
 				perspectiveDivision(projected2);
+				cout << "projected0: \n" << projected0 << endl;
 
 				//duplicate the vertexes again colors because clipping one will affect other lines and we don't want that
 				Vec4 projected0_copy = Vec4(projected0);
 				Vec4 projected1_copy = Vec4(projected1);
 				Vec4 projected2_copy = Vec4(projected2);
+				cout << "projected0_copy: \n" << projected0_copy << endl;
 
 				Color color0_copy = Color(color0);
 				Color color1_copy = Color(color1);
