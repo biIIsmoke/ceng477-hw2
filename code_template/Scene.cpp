@@ -111,6 +111,30 @@ void draw(vector<vector<Color>> & image, int x, int y, Color c)
 	//cout << "image color at " << x << "," << y << " is: " << c << endl;
 }
 
+void triangleRasterization(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Vec4 & viewported2, int horRes, int verRes, Color color0,  Color color1,  Color color2)
+{
+	Color c;
+	double detT;
+	double alpha;
+	double beta;
+	double gamma;
+	for(int x = 0; x<horRes; x++) //change this to bounding box later
+	{
+		for(int y = 0; y<verRes; y++)
+		{
+			detT = (viewported1.y - viewported2.y) * (viewported0.x - viewported2.x) + (viewported2.x - viewported1.x) * (viewported0.y - viewported2.y);
+			alpha = ((viewported1.y - viewported2.y) * (x - viewported2.x) + (viewported2.x - viewported1.x) * (y - viewported2.y)) / detT;
+			beta = ((viewported2.y - viewported0.y) * (x - viewported2.x) + (viewported0.x - viewported2.x) * (y - viewported2.y)) / detT;
+			gamma = 1.0 - alpha - beta;
+			if(alpha >=0 && beta >= 0 and gamma >= 0)
+			{
+				c = colorSummation(colorSummation(colorMultiplier(color0,alpha),colorMultiplier(color1,beta)),colorMultiplier(color2,gamma));
+				draw(image, x, y, roundColor(c));
+			}
+		}
+	}
+}
+
 void midpoint(vector<vector<Color>> & image, Vec4 & viewported0, Vec4 & viewported1, Color & color0, Color & color1)
 {
 	double dx = viewported1.x-viewported0.x;
@@ -849,7 +873,7 @@ void Scene::forwardRenderingPipeline(Camera *camera)
 				Vec4 viewported1 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected1);
 				Vec4 viewported2 = multiplyMatrixWithVec4(cameraViewportTransformationMatrix, projected2);
 				
-				//triangleRasterization(this->image);
+				triangleRasterization(this->image, viewported0, viewported1, viewported2, camera->horRes, camera->verRes, Color(*this->colorsOfVertices[vertex0.colorId-1]), Color(*this->colorsOfVertices[vertex1.colorId-1]), Color(*this->colorsOfVertices[vertex2.colorId-1]));
 			}
 			
 		}
